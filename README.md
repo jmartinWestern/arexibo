@@ -13,6 +13,8 @@ unless tested.
 
 ## Installation
 
+### Building from Source
+
 Currently, no binary builds are provided.
 
 To build from source, you need:
@@ -53,6 +55,47 @@ that RHEL/Fedora don't include in their packages, e.g. from rpmfusion.org.
 For RHEL derived distributions, install `cmake gcc-c++ cargo dbus-devel
 zeromq-devel qt6-qtwebengine-devel`.  For Debian derived, install `cmake g++
 cargo libdbus-1-dev libzmq3-dev qt6-webengine-dev`.
+
+### Using Nix/NixOS
+
+A Nix flake is provided for easy building and installation:
+
+```bash
+# Build the package
+nix build
+
+# Run directly
+nix run
+
+# Install to profile
+nix profile install
+```
+
+For NixOS users, a complete system module is available. See `nixos-module.md` and
+`nixos-example.md` for detailed configuration examples.
+
+To use in your NixOS configuration:
+
+```nix
+{
+  inputs.arexibo.url = "github:birkenfeld/arexibo";  # or local path
+  
+  outputs = { nixpkgs, arexibo, ... }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      modules = [
+        arexibo.nixosModules.default
+        {
+          services.arexibo = {
+            enable = true;
+            host = "https://your-cms.example.com/";
+            key = "your-display-key";
+          };
+        }
+      ];
+    };
+  };
+}
+```
 
 
 ## Usage
