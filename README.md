@@ -84,13 +84,15 @@ To use in your NixOS configuration:
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
       modules = [
         arexibo.nixosModules.default
-        {
-          services.arexibo = {
-            enable = true;
-            host = "https://your-cms.example.com/";
-            key = "your-display-key";
-          };
-        }
+         {
+           services.arexibo = {
+             enable = true;
+             host = "https://your-cms.example.com/";
+             key = "your-display-key";
+             # Optional: displayId = "custom-id";
+             # Optional: displayName = "My Display";
+           };
+         }
       ];
     };
   };
