@@ -164,11 +164,15 @@
                 # Build the configuration command
                 config_cmd="${arexibo}/bin/arexibo --host ${cfg.host} --key ${cfg.key}"
                 
-                ${optionalString (cfg.displayId != null) ''
-                  config_cmd="$config_cmd --display-id ${cfg.displayId}"
-                ''}
-                
-                ${optionalString (cfg.proxy != null) ''
+                 ${optionalString (cfg.displayId != null) ''
+                   config_cmd="$config_cmd --display-id ${cfg.displayId}"
+                 ''}
+                 
+                 ${optionalString (cfg.displayName != null) ''
+                   config_cmd="$config_cmd --display-name ${cfg.displayName}"
+                 ''}
+                 
+                 ${optionalString (cfg.proxy != null) ''
                   config_cmd="$config_cmd --proxy ${cfg.proxy}"
                 ''}
                 
@@ -215,17 +219,26 @@
                 '';
               };
               
-              displayId = mkOption {
-                type = types.nullOr types.str;
-                default = null;
-                example = "custom-display-id";
-                description = ''
-                  Custom display ID for this player. If not specified, one will be
-                  auto-generated from machine characteristics.
-                '';
-              };
-              
-              proxy = mkOption {
+               displayId = mkOption {
+                 type = types.nullOr types.str;
+                 default = null;
+                 example = "custom-display-id";
+                 description = ''
+                   Custom display ID for this player. If not specified, one will be
+                   auto-generated from machine characteristics.
+                 '';
+               };
+               
+               displayName = mkOption {
+                 type = types.nullOr types.str;
+                 default = null;
+                 example = "My Digital Signage Display";
+                 description = ''
+                   Initial name for this display.
+                 '';
+               };
+               
+               proxy = mkOption {
                 type = types.nullOr types.str;
                 default = null;
                 example = "http://proxy.example.com:8080";
