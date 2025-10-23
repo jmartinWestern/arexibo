@@ -111,7 +111,8 @@ Then rebuild: `sudo nixos-rebuild switch`
 **Basic Configuration:**
 - `services.arexibo.enable` - Enable the Arexibo service
 - `services.arexibo.host` - URL of your Xibo CMS server (required)
-- `services.arexibo.key` - Display key from your CMS (required). Can be a string or path to a file containing the key.
+- `services.arexibo.key` - Display key from your CMS (string, mutually exclusive with keyFile)
+- `services.arexibo.keyFile` - Path to file containing display key (for secure storage, takes precedence over key)
 - `services.arexibo.displayId` - Custom display ID (optional, auto-generated if not set)
 - `services.arexibo.displayName` - Initial name for the display (optional)
 - `services.arexibo.proxy` - HTTP proxy URL if needed
@@ -161,7 +162,7 @@ services.arexibo = {
 services.arexibo = {
   enable = true;
   host = "https://signage.company.com/";
-  key = "/run/secrets/arexibo-key";  # Path to key file
+  keyFile = "/run/secrets/arexibo-key";  # Path to key file
 };
 ```
 
@@ -210,13 +211,13 @@ sudo systemctl restart arexibo
 ##### Security Best Practices
 
 **Key Management:**
-- Use file paths for sensitive keys instead of hardcoded values
+- Use `keyFile` for sensitive keys instead of `key`
 - Integrate with NixOS secrets management (sops-nix, agenix)
 - Store keys in `/run/secrets/` with restricted permissions
 
 **Example with sops-nix:**
 ```nix
-services.arexibo.key = config.sops.secrets.arexibo-key.path;
+services.arexibo.keyFile = config.sops.secrets.arexibo-key.path;
 ```
 
 ##### Updates

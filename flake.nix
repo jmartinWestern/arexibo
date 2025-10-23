@@ -162,7 +162,7 @@
                 echo "Running initial Arexibo configuration..."
                 
                 # Build the configuration command
-                key_value=$(if [ -f "${cfg.key}" ]; then cat "${cfg.key}"; else echo "${cfg.key}"; fi)
+                key_value=$(if [ -n "${cfg.keyFile}" ]; then cat "${cfg.keyFile}"; elif [ -n "${cfg.key}" ]; then echo "${cfg.key}"; else echo ""; fi)
                 config_cmd="${arexibo}/bin/arexibo --host ${cfg.host} --key \"$key_value\""
                 
                  ${optionalString (cfg.displayId != null) ''
@@ -212,12 +212,22 @@
               };
               
                key = mkOption {
-                 type = types.either types.str types.path;
+                 type = types.nullOr types.str;
+                 default = null;
                  example = "your-display-key-here";
                  description = ''
-                   The display key for CMS authentication. Can be either:
-                   - A string containing the key directly
-                   - A path to a file containing the key (for secure storage)
+                   The display key for CMS authentication. Can be provided directly as a string.
+                   Mutually exclusive with keyFile.
+                 '';
+               };
+
+               keyFile = mkOption {
+                 type = types.nullOr types.path;
+                 default = null;
+                 example = "/run/secrets/arexibo-key";
+                 description = ''
+                   Path to a file containing the display key for CMS authentication.
+                   Mutually exclusive with key. Takes precedence over key if both are set.
                  '';
                };
               
@@ -410,8 +420,12 @@
                    message = "services.arexibo.host must be set to a valid CMS URL";
                  }
                  {
-                   assertion = (isString cfg.key && cfg.key != "") || isPath cfg.key;
-                   message = "services.arexibo.key must be set to a valid display key or path to key file";
+                   assertion = (cfg.key != null && cfg.key != "") || cfg.keyFile != null;
+                   message = "Either services.arexibo.key or services.arexibo.keyFile must be set";
+                 }
+                 {
+                   assertion = !(cfg.key != null && cfg.keyFile != null);
+                   message = "services.arexibo.key and services.arexibo.keyFile are mutually exclusive";
                  }
                  {
                    assertion = hasPrefix "http" cfg.host;

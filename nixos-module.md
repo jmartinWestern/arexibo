@@ -26,7 +26,8 @@ To enable Arexibo on your NixOS system, add the following to your `configuration
 
 - `services.arexibo.enable` - Enable the Arexibo service
 - `services.arexibo.host` - URL of your Xibo CMS server (required)
-- `services.arexibo.key` - Display key from your CMS (required). Can be a string or path to a file containing the key.
+- `services.arexibo.key` - Display key from your CMS (string, mutually exclusive with keyFile)
+- `services.arexibo.keyFile` - Path to file containing display key (for secure storage, takes precedence over key)
 - `services.arexibo.displayId` - Custom display ID (optional, auto-generated if not set)
 - `services.arexibo.displayName` - Initial name for the display (optional)
 - `services.arexibo.proxy` - HTTP proxy URL if needed
@@ -131,8 +132,7 @@ For a dedicated signage machine with its own X server:
 }
 ```
 
-### High Security Setup
-
+**High Security Setup**
 For environments requiring additional security:
 
 ```nix
@@ -140,8 +140,7 @@ For environments requiring additional security:
   services.arexibo = {
     enable = true;
     host = "https://secure-signage.company.com/";
-    key = "secure-display-key";
-    dataDir = "/opt/arexibo-data";
+    keyFile = "/run/secrets/arexibo-key";  # Use keyFile for secrets
     
     # Use dedicated user/group
     user = "signage";
@@ -231,11 +230,11 @@ The service is configured with several security restrictions:
 
 ### Key Security
 
-The `key` option accepts sensitive authentication credentials. For security:
+The `key` and `keyFile` options handle sensitive authentication credentials. For security:
 
-**✅ Recommended: Use file paths for secrets**
+**✅ Recommended: Use keyFile for secrets**
 ```nix
-services.arexibo.key = "/run/secrets/arexibo-key";
+services.arexibo.keyFile = "/run/secrets/arexibo-key";
 ```
 
 **❌ Avoid: Hardcoded keys**
@@ -244,8 +243,8 @@ services.arexibo.key = "super-secret-key";  # DON'T DO THIS
 ```
 
 **Integration with secrets management:**
-- **sops-nix**: `key = config.sops.secrets.arexibo-key.path;`
-- **agenix**: `key = config.age.secrets.arexibo-key.path;`
+- **sops-nix**: `keyFile = config.sops.secrets.arexibo-key.path;`
+- **agenix**: `keyFile = config.age.secrets.arexibo-key.path;`
 - **Manual**: Store key in `/run/secrets/arexibo-key` with appropriate permissions
 
 For production deployments, consider:

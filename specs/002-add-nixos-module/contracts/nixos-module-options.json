@@ -15,19 +15,13 @@
       "pattern": "^https://"
     },
     "services.arexibo.key": {
-      "oneOf": [
-        {
-          "type": "string",
-          "minLength": 1,
-          "description": "Display key as a string"
-        },
-        {
-          "type": "string",
-          "format": "uri-reference",
-          "description": "Path to a file containing the display key"
-        }
-      ],
-      "description": "Display key for CMS authentication (string or file path)"
+      "type": ["string", "null"],
+      "description": "Display key as a string (mutually exclusive with keyFile)"
+    },
+    "services.arexibo.keyFile": {
+      "type": ["string", "null"],
+      "format": "uri-reference",
+      "description": "Path to a file containing the display key (takes precedence over key)"
     },
     "services.arexibo.displayId": {
       "type": ["string", "null"],
@@ -43,8 +37,17 @@
       "description": "Directory for configuration and media cache"
     }
   },
-  "required": ["services.arexibo.enable"],
   "dependencies": {
-    "services.arexibo.enable": ["services.arexibo.host", "services.arexibo.key"]
+    "services.arexibo.enable": ["services.arexibo.host"],
+    "services.arexibo.key": {
+      "not": {
+        "required": ["services.arexibo.keyFile"]
+      }
+    },
+    "services.arexibo.keyFile": {
+      "not": {
+        "required": ["services.arexibo.key"]
+      }
+    }
   }
 }
