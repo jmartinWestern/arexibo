@@ -207,6 +207,18 @@ sudo journalctl -u arexibo -f
 sudo systemctl restart arexibo
 ```
 
+##### Security Best Practices
+
+**Key Management:**
+- Use file paths for sensitive keys instead of hardcoded values
+- Integrate with NixOS secrets management (sops-nix, agenix)
+- Store keys in `/run/secrets/` with restricted permissions
+
+**Example with sops-nix:**
+```nix
+services.arexibo.key = config.sops.secrets.arexibo-key.path;
+```
+
 ##### Updates
 
 To update Arexibo:

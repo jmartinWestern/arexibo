@@ -229,12 +229,32 @@ The service is configured with several security restrictions:
 - Private temporary directory
 - Protected system directories
 
+### Key Security
+
+The `key` option accepts sensitive authentication credentials. For security:
+
+**✅ Recommended: Use file paths for secrets**
+```nix
+services.arexibo.key = "/run/secrets/arexibo-key";
+```
+
+**❌ Avoid: Hardcoded keys**
+```nix
+services.arexibo.key = "super-secret-key";  # DON'T DO THIS
+```
+
+**Integration with secrets management:**
+- **sops-nix**: `key = config.sops.secrets.arexibo-key.path;`
+- **agenix**: `key = config.age.secrets.arexibo-key.path;`
+- **Manual**: Store key in `/run/secrets/arexibo-key` with appropriate permissions
+
 For production deployments, consider:
 
 - Using HTTPS for CMS connection
 - Implementing network restrictions
 - Regular security updates
 - Monitoring service logs
+- Rotating keys periodically
 
 ## Updates
 
