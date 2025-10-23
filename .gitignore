@@ -2,3 +2,26 @@
 /env*
 /gui/build
 result
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+.envrc
+devenv.nix
+devenv.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Additional Rust/Nix ignore patterns
+/debug/
+/release/
+*.rs.bk
+*.rlib
+*.prof*
+.idea/
+*.log
+.env*

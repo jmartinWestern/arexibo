@@ -1,0 +1,7 @@
+/home/jmartin/development/rust/arexibo/.devenv/flake.json
+/home/jmartin/development/rust/arexibo/.devenv.flake.nix
+/home/jmartin/development/rust/arexibo/.env
+/home/jmartin/development/rust/arexibo/devenv.local.nix
+/home/jmartin/development/rust/arexibo/devenv.lock
+/home/jmartin/development/rust/arexibo/devenv.nix
+/home/jmartin/development/rust/arexibo/devenv.yaml
