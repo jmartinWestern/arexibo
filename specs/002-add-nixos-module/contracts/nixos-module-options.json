@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Arexibo NixOS Module Options",
+  "type": "object",
+  "properties": {
+    "services.arexibo.enable": {
+      "type": "boolean",
+      "description": "Enable the Arexibo digital signage service",
+      "default": false
+    },
+    "services.arexibo.host": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the Xibo CMS server",
+      "pattern": "^https://"
+    },
+    "services.arexibo.key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display key for CMS authentication"
+    },
+    "services.arexibo.displayId": {
+      "type": ["string", "null"],
+      "description": "Unique display identifier (auto-generated if null)"
+    },
+    "services.arexibo.displayName": {
+      "type": ["string", "null"],
+      "description": "Initial name for this display"
+    },
+    "services.arexibo.dataDir": {
+      "type": "string",
+      "default": "/var/lib/arexibo",
+      "description": "Directory for configuration and media cache"
+    }
+  },
+  "required": ["services.arexibo.enable"],
+  "dependencies": {
+    "services.arexibo.enable": ["services.arexibo.host", "services.arexibo.key"]
+  }
+}

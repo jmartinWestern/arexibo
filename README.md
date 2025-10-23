@@ -89,13 +89,15 @@ Add the following to your `configuration.nix`:
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
       modules = [
         arexibo.nixosModules.default
-        {
-          services.arexibo = {
-            enable = true;
-            host = "https://your-cms.example.com/";
-            key = "your-display-key";
-          };
-        }
+         {
+           services.arexibo = {
+             enable = true;
+             host = "https://your-cms.example.com/";
+             key = "your-display-key";
+             # Optional: displayId = "custom-id";
+             # Optional: displayName = "My Display";
+           };
+         }
       ];
     };
   };
@@ -109,7 +111,7 @@ Then rebuild: `sudo nixos-rebuild switch`
 **Basic Configuration:**
 - `services.arexibo.enable` - Enable the Arexibo service
 - `services.arexibo.host` - URL of your Xibo CMS server (required)
-- `services.arexibo.key` - Display key from your CMS (required)
+- `services.arexibo.key` - Display key from your CMS (required). Can be a string or path to a file containing the key.
 - `services.arexibo.displayId` - Custom display ID (optional, auto-generated if not set)
 - `services.arexibo.displayName` - Initial name for the display (optional)
 - `services.arexibo.proxy` - HTTP proxy URL if needed
@@ -149,8 +151,17 @@ services.arexibo.extraEnvironment = {
 services.arexibo = {
   enable = true;
   host = "https://signage.company.com/";
-  key = "abc123def456ghi789";
+  key = "abc123def456ghi789";  # Direct key value
   proxy = "http://corporate-proxy.company.com:8080";
+};
+```
+
+**Using Key File (Secure):**
+```nix
+services.arexibo = {
+  enable = true;
+  host = "https://signage.company.com/";
+  key = "/run/secrets/arexibo-key";  # Path to key file
 };
 ```
 

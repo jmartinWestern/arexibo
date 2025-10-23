@@ -26,8 +26,9 @@ To enable Arexibo on your NixOS system, add the following to your `configuration
 
 - `services.arexibo.enable` - Enable the Arexibo service
 - `services.arexibo.host` - URL of your Xibo CMS server (required)
-- `services.arexibo.key` - Display key from your CMS (required)
+- `services.arexibo.key` - Display key from your CMS (required). Can be a string or path to a file containing the key.
 - `services.arexibo.displayId` - Custom display ID (optional, auto-generated if not set)
+- `services.arexibo.displayName` - Initial name for the display (optional)
 - `services.arexibo.proxy` - HTTP proxy URL if needed
 
 ### System Configuration
@@ -106,6 +107,7 @@ For a dedicated signage machine with its own X server:
     host = "https://signage.company.com/";
     key = "abc123def456ghi789";
     displayId = "lobby-display-01";
+    displayName = "Lobby Digital Signage";
     
     xserver = {
       enable = true;

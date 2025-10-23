@@ -162,13 +162,18 @@
                 echo "Running initial Arexibo configuration..."
                 
                 # Build the configuration command
-                config_cmd="${arexibo}/bin/arexibo --host ${cfg.host} --key ${cfg.key}"
+                key_value=$(if [ -f "${cfg.key}" ]; then cat "${cfg.key}"; else echo "${cfg.key}"; fi)
+                config_cmd="${arexibo}/bin/arexibo --host ${cfg.host} --key \"$key_value\""
                 
-                ${optionalString (cfg.displayId != null) ''
-                  config_cmd="$config_cmd --display-id ${cfg.displayId}"
-                ''}
-                
-                ${optionalString (cfg.proxy != null) ''
+                 ${optionalString (cfg.displayId != null) ''
+                   config_cmd="$config_cmd --display-id ${cfg.displayId}"
+                 ''}
+                 
+                 ${optionalString (cfg.displayName != null) ''
+                   config_cmd="$config_cmd --display-name ${cfg.displayName}"
+                 ''}
+                 
+                 ${optionalString (cfg.proxy != null) ''
                   config_cmd="$config_cmd --proxy ${cfg.proxy}"
                 ''}
                 
@@ -206,26 +211,36 @@
                 '';
               };
               
-              key = mkOption {
-                type = types.str;
-                example = "your-display-key-here";
-                description = ''
-                  The display key provided by the Xibo CMS for this player.
-                  This is used to authenticate the player with the CMS.
-                '';
-              };
+               key = mkOption {
+                 type = types.either types.str types.path;
+                 example = "your-display-key-here";
+                 description = ''
+                   The display key for CMS authentication. Can be either:
+                   - A string containing the key directly
+                   - A path to a file containing the key (for secure storage)
+                 '';
+               };
               
-              displayId = mkOption {
-                type = types.nullOr types.str;
-                default = null;
-                example = "custom-display-id";
-                description = ''
-                  Custom display ID for this player. If not specified, one will be
-                  auto-generated from machine characteristics.
-                '';
-              };
-              
-              proxy = mkOption {
+               displayId = mkOption {
+                 type = types.nullOr types.str;
+                 default = null;
+                 example = "custom-display-id";
+                 description = ''
+                   Custom display ID for this player. If not specified, one will be
+                   auto-generated from machine characteristics.
+                 '';
+               };
+               
+               displayName = mkOption {
+                 type = types.nullOr types.str;
+                 default = null;
+                 example = "My Digital Signage Display";
+                 description = ''
+                   Initial name for this display.
+                 '';
+               };
+               
+               proxy = mkOption {
                 type = types.nullOr types.str;
                 default = null;
                 example = "http://proxy.example.com:8080";
@@ -388,21 +403,21 @@
                 displayManager.startx.enable = true;
               };
               
-              # Add configuration validation
-              assertions = [
-                {
-                  assertion = cfg.host != "";
-                  message = "services.arexibo.host must be set to a valid CMS URL";
-                }
-                {
-                  assertion = cfg.key != "";
-                  message = "services.arexibo.key must be set to a valid display key";
-                }
-                {
-                  assertion = hasPrefix "http" cfg.host;
-                  message = "services.arexibo.host must start with http:// or https://";
-                }
-              ];
+               # Add configuration validation
+               assertions = [
+                 {
+                   assertion = cfg.host != "";
+                   message = "services.arexibo.host must be set to a valid CMS URL";
+                 }
+                 {
+                   assertion = (isString cfg.key && cfg.key != "") || isPath cfg.key;
+                   message = "services.arexibo.key must be set to a valid display key or path to key file";
+                 }
+                 {
+                   assertion = hasPrefix "http" cfg.host;
+                   message = "services.arexibo.host must start with http:// or https://";
+                 }
+               ];
             };
             
             meta = {
