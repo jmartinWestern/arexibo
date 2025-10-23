@@ -58,6 +58,8 @@ cargo libdbus-1-dev libzmq3-dev qt6-webengine-dev`.
 
 ### Using Nix/NixOS
 
+### Using Nix/NixOS
+
 A Nix flake is provided for easy building and installation:
 
 ```bash
@@ -71,14 +73,17 @@ nix run
 nix profile install
 ```
 
-For NixOS users, a complete system module is available. See `nixos-module.md` and
-`nixos-example.md` for detailed configuration examples.
+#### NixOS Module
 
-To use in your NixOS configuration:
+For NixOS users, a complete system module is available that provides declarative configuration and systemd integration for Arexibo as a digital signage service.
+
+##### Quick Start
+
+Add the following to your `configuration.nix`:
 
 ```nix
 {
-  inputs.arexibo.url = "github:birkenfeld/arexibo";  # or local path
+  inputs.arexibo.url = "github:jmartinWestern/arexibo";  # or local path
   
   outputs = { nixpkgs, arexibo, ... }: {
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
@@ -96,6 +101,109 @@ To use in your NixOS configuration:
   };
 }
 ```
+
+Then rebuild: `sudo nixos-rebuild switch`
+
+##### Configuration Options
+
+**Basic Configuration:**
+- `services.arexibo.enable` - Enable the Arexibo service
+- `services.arexibo.host` - URL of your Xibo CMS server (required)
+- `services.arexibo.key` - Display key from your CMS (required)
+- `services.arexibo.displayId` - Custom display ID (optional, auto-generated if not set)
+- `services.arexibo.displayName` - Initial name for the display (optional)
+- `services.arexibo.proxy` - HTTP proxy URL if needed
+
+**System Configuration:**
+- `services.arexibo.dataDir` - Directory for config and media files (default: `/var/lib/arexibo`)
+- `services.arexibo.user` - Service user account (default: `arexibo`)
+- `services.arexibo.group` - Service group account (default: `arexibo`)
+- `services.arexibo.autoStart` - Auto-start on boot (default: `true`)
+
+**X Server Configuration (for dedicated displays):**
+```nix
+services.arexibo.xserver = {
+  enable = true;        # Run with dedicated X server
+  display = ":0";       # X11 display number
+  vt = "vt2";          # Virtual terminal
+  extraArgs = [        # Additional X server arguments
+    "-s" "0"           # Disable screensaver
+    "-v"               # Verbose
+    "-dpms"            # Disable DPMS
+  ];
+};
+```
+
+**Environment Variables:**
+```nix
+services.arexibo.extraEnvironment = {
+  NO_AT_BRIDGE = "1";
+  QT_QPA_PLATFORM = "xcb";
+};
+```
+
+##### Example Configurations
+
+**Basic Setup (Existing Desktop):**
+```nix
+services.arexibo = {
+  enable = true;
+  host = "https://signage.company.com/";
+  key = "abc123def456ghi789";
+  proxy = "http://corporate-proxy.company.com:8080";
+};
+```
+
+**Dedicated Kiosk/Signage Display:**
+```nix
+services.arexibo = {
+  enable = true;
+  host = "https://signage.company.com/";
+  key = "abc123def456ghi789";
+  displayId = "lobby-display-01";
+  displayName = "Lobby Digital Signage";
+  
+  xserver = {
+    enable = true;
+    display = ":0";
+    vt = "vt2";
+    extraArgs = [ "-s" "0" "-v" "-dpms" ];
+  };
+  
+  extraEnvironment = {
+    NO_AT_BRIDGE = "1";
+    QT_QPA_PLATFORM = "xcb";
+  };
+};
+
+# Ensure X server is properly configured
+services.xserver.enable = true;
+services.xserver.displayManager.gdm.enable = false;  # Disable desktop manager for kiosk
+```
+
+##### Service Management
+
+After configuration:
+
+```bash
+# Check status
+sudo systemctl status arexibo
+
+# View logs
+sudo journalctl -u arexibo -f
+
+# Restart service
+sudo systemctl restart arexibo
+```
+
+##### Updates
+
+To update Arexibo:
+1. Update the flake: `nix flake update` in the Arexibo directory
+2. Rebuild your system: `sudo nixos-rebuild switch`
+3. Restart the service: `sudo systemctl restart arexibo`
+
+For detailed documentation, see `nixos-module.md`.
 
 
 ## Usage
